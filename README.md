@@ -1,5 +1,7 @@
 # Semantic Axes
 
+### ▶ Live demo: https://jimdc.github.io/semantic-axes/
+
 **Type a word — discover the named axes it loads on, then wander its neighborhood.**
 
 Type `king` and the tool *proposes* the directions that word leans on — **royalty, power, gender** —
