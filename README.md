@@ -102,8 +102,9 @@ polysemy (`wolf` splits into the animal *dog · beaver · eagle* and the surname
 - **Vectors.** GloVe 6B (300-d); the ~169k most frequent clean tokens are mean-centered →
   L2-normalized → int8-quantized. The browser computes on the int8 bytes directly (no float copy),
   so memory ≈ download size. Every dot product is a cosine in [−1, 1].
-- **Axes.** Each bank axis is `unit(mean over pairs of (v(pos) − v(neg)))`
-  ([Bolukbasi 2016](https://arxiv.org/abs/1607.06520) / [SemAxis 2018](https://arxiv.org/abs/1806.05521)).
+- **Axes.** Each bank axis is `unit(mean over pairs of (v(pos) − v(neg)))` — the difference-of-anchors
+  / semantic-projection construction ([SemAxis](https://arxiv.org/abs/1806.05521),
+  [POLAR](https://arxiv.org/abs/2001.09876), [Grand et al. 2022](https://arxiv.org/abs/1802.01241)).
   A word's position is the centered dot product; "salient axes" = the bank ranked by |projection|.
 - **Discovery.** Local PCA over a word's neighborhood finds directions the bank never named; each is
   labeled by its nearest bank axis (when there's a real resemblance) and its extreme words.
@@ -114,14 +115,25 @@ polysemy (`wolf` splits into the animal *dog · beaver · eagle* and the surname
 
 ## What a score measures
 
-Each axis is a direction in a space fit under the **distributional hypothesis** (tokens that share
-contexts get nearby vectors), so a projection is a **statistic of the training corpus**: it summarizes
-how words' co-occurrence patterns covary, not a fact about the world. Those patterns carry ordinary
-linguistic structure (number, tense, semantic field) alongside the social regularities of the text —
-the latter being what the embedding-association literature
-([Bolukbasi 2016](https://arxiv.org/abs/1607.06520), [WEAT](https://arxiv.org/abs/1608.07187))
-quantifies. Read a value as a measurement of the corpus: dependent on the training sample and the word
-set you compare, and (for the static substrate) collapsed across context and word sense.
+A projection is a **statistic of the training corpus**, read out of a vector space fit under the
+**distributional hypothesis** (tokens that share contexts get nearby vectors) — not a fact about the
+world. The operation is old and general; several traditions frame it:
+
+- **Semantic differential** ([Osgood 1957](https://en.wikipedia.org/wiki/Semantic_differential)) — the
+  psychometric origin: meaning as a position between polar opposites (cold–hot, soft–hard).
+- **Semantic projection** ([Grand et al. 2022](https://arxiv.org/abs/1802.01241), *Nature Human
+  Behaviour*) — projecting onto a feature line (size, danger, wealth) recovers graded human knowledge
+  (animals sort ant → whale on *size*). The clearest statement of what this tool does.
+- **Linguistic regularities** ([Mikolov 2013](https://aclanthology.org/N13-1090/)) — the analogy
+  paradigm, king − man + woman ≈ queen.
+- **Interpretable dimensions** ([POLAR 2020](https://arxiv.org/abs/2001.09876),
+  [SemAxis 2018](https://arxiv.org/abs/1806.05521)) — re-expressing embeddings on polar-opposite axes.
+- **Embedding associations / bias** ([Bolukbasi 2016](https://arxiv.org/abs/1607.06520),
+  [WEAT 2017](https://arxiv.org/abs/1608.07187)) — the *same* projection applied to social categories;
+  one application, not the defining one.
+
+A value depends on the training sample and the poles you choose, and (for the static substrate) it
+collapses context and word sense.
 
 ## Limitations
 
@@ -153,8 +165,11 @@ tests/browser/        playwright smoke test + screenshots
 ## Credits & licence
 
 [GloVe](https://nlp.stanford.edu/projects/glove/) (Pennington et al., Stanford NLP). SAE features and
-explanations via [Neuronpedia](https://neuronpedia.org). Axis method:
-[Bolukbasi et al. 2016](https://arxiv.org/abs/1607.06520);
-[An et al. (SemAxis) 2018](https://arxiv.org/abs/1806.05521);
-[Caliskan et al. (WEAT) 2017](https://arxiv.org/abs/1608.07187).
+explanations via [Neuronpedia](https://neuronpedia.org). Semantic-axis lineage:
+[Osgood 1957](https://en.wikipedia.org/wiki/Semantic_differential) (semantic differential),
+[Grand et al. 2022](https://arxiv.org/abs/1802.01241) (semantic projection),
+[Mikolov 2013](https://aclanthology.org/N13-1090/) (linguistic regularities),
+[SemAxis 2018](https://arxiv.org/abs/1806.05521) / [POLAR 2020](https://arxiv.org/abs/2001.09876)
+(interpretable dimensions), and the embedding-association line
+[Bolukbasi 2016](https://arxiv.org/abs/1607.06520) / [WEAT 2017](https://arxiv.org/abs/1608.07187).
 Code MIT-licensed; the GloVe vectors and Neuronpedia data carry their own terms.

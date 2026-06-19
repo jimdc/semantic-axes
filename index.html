@@ -91,26 +91,33 @@
   </section>
 
   <p class="bias-note">
-    <b>What a score measures.</b> Each axis is a direction in a vector space fit under the
-    <i>distributional hypothesis</i> — tokens that share contexts get nearby vectors. A projection
-    such as “father → man” is therefore a statistic of the training corpus: it summarizes how the
-    two words’ <b>co-occurrence patterns covary</b>, not a fact about the world. Those patterns carry
-    ordinary linguistic structure (number, tense, semantic field) together with the social
-    regularities of the text — the latter being exactly what the embedding-association literature
+    <b>What a score measures.</b> A projection is a statistic of the training corpus, read out of a
+    vector space fit under the <i>distributional hypothesis</i> (tokens that share contexts get nearby
+    vectors). The operation is old and general — locate a word between two poles, as in Osgood’s
+    <a href="https://en.wikipedia.org/wiki/Semantic_differential" target="_blank" rel="noopener">semantic
+    differential</a> (1957) — and done well it recovers graded human knowledge: Grand et al.’s
+    <a href="https://arxiv.org/abs/1802.01241" target="_blank" rel="noopener">semantic projection</a>
+    lays animals along a <i>size</i> line (ant → whale) or a <i>danger</i> line and matches people’s
+    ratings. The same geometry yields the analogy regularities
+    (<a href="https://aclanthology.org/N13-1090/" target="_blank" rel="noopener">Mikolov 2013</a>:
+    king − man + woman ≈ queen) and the interpretable dimensions of
+    <a href="https://arxiv.org/abs/2001.09876" target="_blank" rel="noopener">POLAR</a> /
+    <a href="https://arxiv.org/abs/1806.05521" target="_blank" rel="noopener">SemAxis</a>. Projecting
+    onto <i>social</i> categories — what the association literature
     (<a href="https://arxiv.org/abs/1607.06520" target="_blank" rel="noopener">Bolukbasi 2016</a>,
-    <a href="https://arxiv.org/abs/1608.07187" target="_blank" rel="noopener">WEAT</a>) sets out to
-    quantify. So read a value as a <b>measurement of the corpus</b>: real signal about language and
-    about the text’s authorship, dependent on the training sample and the word set you compare, and —
-    for these static vectors — collapsed across context and word sense.
+    <a href="https://arxiv.org/abs/1608.07187" target="_blank" rel="noopener">WEAT</a>) measures — is
+    one application of this, not the whole story. A value depends on the training sample and the poles
+    you pick, and these static vectors collapse context and word sense.
   </p>
 
   <footer>
     Static substrate: GloVe 6B (Wikipedia + Gigaword, 300-d), centered → L2-normalized → int8.
     SAE substrate: live feature activations via
     <a href="https://neuronpedia.org" target="_blank" rel="noopener">Neuronpedia</a>.
-    Axis method: difference-of-anchors
-    (<a href="https://arxiv.org/abs/1607.06520" target="_blank" rel="noopener">Bolukbasi 2016</a> /
-    <a href="https://arxiv.org/abs/1806.05521" target="_blank" rel="noopener">SemAxis 2018</a>).
+    Axis method: difference-of-anchors / semantic projection
+    (<a href="https://arxiv.org/abs/1802.01241" target="_blank" rel="noopener">Grand 2022</a>,
+    <a href="https://arxiv.org/abs/1806.05521" target="_blank" rel="noopener">SemAxis 2018</a>,
+    <a href="https://arxiv.org/abs/2001.09876" target="_blank" rel="noopener">POLAR 2020</a>).
     Free &amp; open source.
   </footer>
 
