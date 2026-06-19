@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semantic Axes — explore the shape of word meaning</title>
+  <meta name="description" content="Type a word and discover the named axes it loads on — gender, royalty, power — then explore neighboring words along each.">
+  <link rel="stylesheet" href="static/styles.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Semantic Axes</h1>
+    <p class="sub">Type a word. The tool reads it out of a word-embedding space and shows you the
+      named <b>axes</b> it leans on, the words nearest to it, a 2-D map of its neighborhood, and
+      the axes hiding in that neighborhood. Where the projector makes you guess an axis, this one
+      <b>proposes</b> them. Then keep clicking to wander.</p>
+
+    <form id="queryForm" autocomplete="off">
+      <input id="queryInput" type="text" placeholder="a word, e.g. king" aria-label="word to explore" spellcheck="false">
+      <button type="submit">explore</button>
+    </form>
+    <div class="samples">try:
+      <button data-sample="king">king</button>·
+      <button data-sample="mother">mother</button>·
+      <button data-sample="ocean">ocean</button>·
+      <button data-sample="scientist">scientist</button>·
+      <button data-sample="paris">paris</button>·
+      <button data-sample="money">money</button>·
+      <button data-sample="wolf">wolf</button>·
+      <button data-sample="hug">hug</button>
+    </div>
+    <div id="metaLine">loading embeddings…</div>
+    <div id="backendToggle" class="backend-toggle">substrate:
+      <button data-backend="static" class="active">static embeddings</button>
+      <button data-backend="sae">SAE features</button>
+      <span class="hint" id="backendHint"></span>
+    </div>
+  </header>
+
+  <div id="notice"></div>
+
+  <section id="axisSection">
+    <p class="eyebrow" id="axisEyebrow">where <b id="currentWord">king</b> sits — its most salient axes</p>
+    <canvas id="axisBars"></canvas>
+    <div id="featureList" style="display:none;"></div>
+    <p class="hint" id="axisHint">bar points toward the pole the word leans to; length = strength. Click an axis to fan its neighbors out along it.</p>
+  </section>
+
+  <section id="spectrumWrap" style="display:none;">
+    <p id="spectrumTitle"></p>
+    <canvas id="spectrum"></canvas>
+  </section>
+
+  <section id="neighborSection">
+    <p class="eyebrow">nearest in meaning</p>
+    <div id="neighbors"></div>
+  </section>
+
+  <section id="scatterSection" style="display:none;">
+    <p class="eyebrow">map <b id="scatterWord">king</b>’s neighborhood on two axes</p>
+    <div class="axis-pickers">
+      <label>x <select id="scatterXsel"></select></label>
+      <label>y <select id="scatterYsel"></select></label>
+      <span class="hint">click any point to explore that word</span>
+    </div>
+    <canvas id="scatter"></canvas>
+  </section>
+
+  <section id="customSection">
+    <p class="eyebrow">build your own axis <span class="muted">— two opposing words define a direction</span></p>
+    <form id="customForm" class="custom-form" autocomplete="off">
+      <input id="customNeg" placeholder="art" aria-label="negative pole word" spellcheck="false">
+      <span class="cust-arrow">⟷</span>
+      <input id="customPos" placeholder="science" aria-label="positive pole word" spellcheck="false">
+      <button type="submit">build</button>
+    </form>
+    <div id="customResult" style="display:none;">
+      <div id="customErr" class="cust-err"></div>
+      <p id="customTitle"></p>
+      <canvas id="customSpectrum"></canvas>
+    </div>
+  </section>
+
+  <section id="discoverySection" style="display:none;">
+    <p class="eyebrow">axes <b>discovered</b> in the neighborhood
+      <span class="muted">— unsupervised PCA, model-proposed, not from the curated bank</span></p>
+    <div id="discovery"></div>
+  </section>
+
+  <p class="bias-note">
+    <b>What you’re actually seeing.</b> These axes are the <b>learned associations</b> of a
+    word-embedding trained on web text — a mirror of how words co-occur, <i>not</i> a statement
+    of how the world is. “father ↔ man” here is the same signal the bias-in-embeddings literature
+    studies (<a href="https://arxiv.org/abs/1607.06520" target="_blank" rel="noopener">Bolukbasi 2016</a>,
+    <a href="https://arxiv.org/abs/1608.07187" target="_blank" rel="noopener">WEAT</a>). Read it as
+    the model’s associations, with all their stereotypes intact.
+  </p>
+
+  <footer>
+    Static substrate: GloVe 6B (Wikipedia + Gigaword, 300-d), centered → L2-normalized → int8.
+    SAE substrate: live feature activations via
+    <a href="https://neuronpedia.org" target="_blank" rel="noopener">Neuronpedia</a>.
+    Axis method: difference-of-anchors
+    (<a href="https://arxiv.org/abs/1607.06520" target="_blank" rel="noopener">Bolukbasi 2016</a> /
+    <a href="https://arxiv.org/abs/1806.05521" target="_blank" rel="noopener">SemAxis 2018</a>).
+    Free &amp; open source.
+  </footer>
+
+</div>
+
+<script src="static/embed.js"></script>
+<script src="static/backend.js"></script>
+<script src="static/vis.js"></script>
+<script src="static/app.js"></script>
+<script>
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
+    addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(() => {}));
+</script>
+</body>
+</html>

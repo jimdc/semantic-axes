@@ -1,0 +1,90 @@
+:root {
+  --ink: #1a1a1a; --mute: #6f6f6f; --faint: #d8d8d8; --paper: #fbfaf7;
+  --accent: #b3541e; --accent2: #27506b; --hair: #e7e3dc;
+  --serif: "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); }
+body { line-height: 1.5; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 2.2rem 1.4rem 5rem; }
+
+header h1 { font-family: var(--serif); font-weight: 600; font-size: 1.9rem; margin: 0 0 .15rem; letter-spacing: -0.01em; }
+header .sub { color: var(--mute); font-size: .95rem; margin: 0 0 1.4rem; max-width: 60ch; }
+header .sub b { color: var(--ink); font-weight: 600; }
+
+#queryForm { display: flex; gap: .5rem; margin-bottom: .5rem; }
+#queryInput {
+  flex: 1; font-family: var(--serif); font-size: 1.5rem; padding: .45rem .7rem;
+  border: 1px solid var(--ink); border-radius: 2px; background: #fff; color: var(--ink);
+}
+#queryInput:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+#queryForm button { font-size: 1rem; padding: 0 1.1rem; border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: 2px; cursor: pointer; }
+
+.samples { font-size: .85rem; color: var(--mute); margin-bottom: .4rem; }
+.samples button { font-family: var(--serif); font-size: .92rem; background: none; border: none; border-bottom: 1px dotted var(--mute); color: var(--accent2); cursor: pointer; padding: 0 .1rem; margin: 0 .15rem; }
+.samples button:hover { color: var(--accent); }
+#metaLine { font-size: .78rem; color: var(--mute); margin-bottom: 1.6rem; font-variant-numeric: tabular-nums; }
+
+.backend-toggle { font-size: .78rem; color: var(--mute); margin: -.8rem 0 1.6rem; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.backend-toggle button { font-family: var(--sans); font-size: .78rem; padding: .15rem .6rem; border: 1px solid var(--hair); background: #fff; color: var(--mute); border-radius: 2px; cursor: pointer; }
+.backend-toggle button.active { border-color: var(--ink); background: var(--ink); color: #fff; }
+.backend-toggle .hint { margin: 0; }
+
+/* SAE feature list */
+.feat-row { margin: .45rem 0; }
+.feat-label { display: block; font-family: var(--serif); font-size: 1.02rem; color: var(--ink); text-decoration: none; border-bottom: 1px dotted transparent; }
+.feat-label:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.feat-act { color: var(--mute); font-size: .8rem; font-variant-numeric: tabular-nums; }
+.feat-track { height: 6px; background: #efeae3; border-radius: 2px; margin-top: .2rem; overflow: hidden; }
+.feat-meter { height: 100%; background: var(--accent); }
+
+section { margin-bottom: 2rem; }
+.eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: var(--mute); margin: 0 0 .5rem; }
+.eyebrow b { color: var(--accent); font-weight: 700; }
+h2.word { font-family: var(--serif); font-size: 1.5rem; margin: 0 0 .1rem; font-style: italic; }
+
+canvas { display: block; max-width: 100%; }
+#axisBars { margin-top: .2rem; }
+.hint { font-size: .82rem; color: var(--mute); font-style: italic; margin: .2rem 0 .6rem; }
+
+#neighbors { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .3rem; }
+.chip { font-family: var(--serif); font-size: 1rem; padding: .15rem .55rem; background: #fff; border: 1px solid var(--hair); border-radius: 2px; cursor: pointer; color: var(--ink); }
+.chip:hover { border-color: var(--accent); color: var(--accent); background: #fff7f1; }
+
+#spectrumWrap { border-top: 1px solid var(--hair); padding-top: 1rem; }
+#spectrumTitle { font-size: .95rem; margin-bottom: .2rem; }
+.muted { color: var(--mute); font-weight: 400; }
+
+#notice { display: none; background: #fff4ec; border: 1px solid #f0c9ad; padding: .7rem .9rem; border-radius: 3px; font-size: .92rem; }
+
+/* two-axis scatter */
+.axis-pickers { display: flex; align-items: center; gap: 1rem; margin: .1rem 0 .5rem; font-size: .85rem; color: var(--mute); flex-wrap: wrap; }
+.axis-pickers label { color: var(--ink); }
+.axis-pickers select { font-family: var(--serif); font-size: .95rem; padding: .12rem .3rem; border: 1px solid var(--hair); border-radius: 2px; background: #fff; color: var(--accent2); cursor: pointer; }
+.axis-pickers .hint { margin: 0; }
+#scatter { margin-top: .2rem; }
+
+/* custom-axis builder */
+.custom-form { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin: .2rem 0 .4rem; }
+.custom-form input { font-family: var(--serif); font-size: 1.05rem; width: 8rem; padding: .25rem .5rem; border: 1px solid var(--hair); border-radius: 2px; background: #fff; color: var(--ink); }
+.custom-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.custom-form .cust-arrow { color: var(--mute); font-size: 1.1rem; }
+.custom-form button { font-size: .92rem; padding: .25rem .9rem; border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: 2px; cursor: pointer; }
+.cust-err { color: var(--accent); font-size: .85rem; margin: .2rem 0; }
+#customTitle { font-size: .95rem; margin: .3rem 0 .1rem; }
+
+/* discovered axes (local PCA) */
+.disc-row { padding: .4rem 0; border-bottom: 1px dotted var(--hair); display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .8rem; }
+.disc-row:last-child { border-bottom: none; }
+.disc-label { font-size: .82rem; font-family: var(--sans); color: var(--accent); font-weight: 600; min-width: 8.5rem; }
+.disc-label .muted { font-weight: 400; }
+.disc-poles { font-family: var(--serif); }
+.disc-arrow { color: var(--mute); padding: 0 .15rem; }
+.wlink { font-family: var(--serif); font-size: 1rem; background: none; border: none; color: var(--ink); cursor: pointer; padding: 0 .15rem; border-bottom: 1px dotted var(--faint); }
+.wlink:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+.bias-note { margin-top: 2.5rem; border-top: 1px solid var(--hair); padding-top: 1rem; font-size: .82rem; color: var(--mute); max-width: 64ch; }
+.bias-note b { color: var(--accent2); }
+footer { margin-top: 2rem; font-size: .76rem; color: var(--mute); }
+footer code { font-family: ui-monospace, Menlo, monospace; background: #f1ede6; padding: .05rem .3rem; border-radius: 2px; }

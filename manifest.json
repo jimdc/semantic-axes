@@ -1,0 +1,9 @@
+{
+  "name": "Semantic Axes",
+  "short_name": "Axes",
+  "description": "Explore the named axes a word loads on, and wander its neighborhood.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fbfaf7",
+  "theme_color": "#b3541e"
+}

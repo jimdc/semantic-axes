@@ -1,0 +1,15 @@
+# build inputs (large, re-downloadable) — not shipped; data/*.json + vectors.bin ARE shipped
+data/glove*.txt
+data/glove*.zip
+node_modules/
+test-results/
+.DS_Store
+
+# secrets — NEVER commit an API key
+.secrets.env
+.env
+.venv/
+
+# python bytecode
+__pycache__/
+*.pyc

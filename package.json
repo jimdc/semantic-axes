@@ -1,0 +1,15 @@
+{
+  "name": "semantic-axes",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Type a word, discover the named axes it loads on, and wander its neighborhood.",
+  "scripts": {
+    "serve": "python3 -m http.server 8777",
+    "test": "node --test tests/unit/*.test.js",
+    "test:browser": "playwright test tests/browser/",
+    "shot": "node tests/browser/screenshot.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

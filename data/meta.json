@@ -1,0 +1,16 @@
+{
+ "model": "glove.6B.300d.txt",
+ "dim": 300,
+ "count": 168972,
+ "scale": 0.004216872155666351,
+ "quant": "int8",
+ "preprocessing": {
+  "center": true,
+  "l2": true,
+  "abtt": 0
+ },
+ "n_axes": 36,
+ "source": "GloVe (Wikipedia+Gigaword, 6B, 300d)",
+ "note": "Axes encode the embedding's LEARNED ASSOCIATIONS, not ground truth.",
+ "built": "2026-06-19"
+}

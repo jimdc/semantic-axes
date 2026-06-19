@@ -1,0 +1,5 @@
+# Large binary vector blob — stored via Git LFS (https://git-lfs.com).
+# Run `git lfs install` once before cloning/committing.
+data/vectors.bin filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.bin !text !filter !merge !diff
