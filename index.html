@@ -91,12 +91,17 @@
   </section>
 
   <p class="bias-note">
-    <b>What you’re actually seeing.</b> These axes are the <b>learned associations</b> of a
-    word-embedding trained on web text — a mirror of how words co-occur, <i>not</i> a statement
-    of how the world is. “father ↔ man” here is the same signal the bias-in-embeddings literature
-    studies (<a href="https://arxiv.org/abs/1607.06520" target="_blank" rel="noopener">Bolukbasi 2016</a>,
-    <a href="https://arxiv.org/abs/1608.07187" target="_blank" rel="noopener">WEAT</a>). Read it as
-    the model’s associations, with all their stereotypes intact.
+    <b>What a score measures.</b> Each axis is a direction in a vector space fit under the
+    <i>distributional hypothesis</i> — tokens that share contexts get nearby vectors. A projection
+    such as “father → man” is therefore a statistic of the training corpus: it summarizes how the
+    two words’ <b>co-occurrence patterns covary</b>, not a fact about the world. Those patterns carry
+    ordinary linguistic structure (number, tense, semantic field) together with the social
+    regularities of the text — the latter being exactly what the embedding-association literature
+    (<a href="https://arxiv.org/abs/1607.06520" target="_blank" rel="noopener">Bolukbasi 2016</a>,
+    <a href="https://arxiv.org/abs/1608.07187" target="_blank" rel="noopener">WEAT</a>) sets out to
+    quantify. So read a value as a <b>measurement of the corpus</b>: real signal about language and
+    about the text’s authorship, dependent on the training sample and the word set you compare, and —
+    for these static vectors — collapsed across context and word sense.
   </p>
 
   <footer>

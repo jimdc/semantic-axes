@@ -112,11 +112,16 @@ polysemy (`wolf` splits into the animal *dog · beaver · eagle* and the surname
   run is resumable/mergeable, so coverage grows toward `--all` (full static↔SAE symmetry). No key or
   cross-origin call ever happens client-side.
 
-## What you're seeing (honesty)
+## What a score measures
 
-These axes are **learned associations**, not ground truth — a mirror of how words co-occur in the
-training text, stereotypes and all. The UI says so on the page. Treat "father ↔ man" as *the model's*
-association, not a fact about the world.
+Each axis is a direction in a space fit under the **distributional hypothesis** (tokens that share
+contexts get nearby vectors), so a projection is a **statistic of the training corpus**: it summarizes
+how words' co-occurrence patterns covary, not a fact about the world. Those patterns carry ordinary
+linguistic structure (number, tense, semantic field) alongside the social regularities of the text —
+the latter being what the embedding-association literature
+([Bolukbasi 2016](https://arxiv.org/abs/1607.06520), [WEAT](https://arxiv.org/abs/1608.07187))
+quantifies. Read a value as a measurement of the corpus: dependent on the training sample and the word
+set you compare, and (for the static substrate) collapsed across context and word sense.
 
 ## Limitations
 
