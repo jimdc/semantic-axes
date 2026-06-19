@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why vector search? — an intuition pump</title>
+  <meta name="description" content="A keyword search matches letters; a vector search matches meaning. Type a word and watch the gap, side by side.">
+  <link rel="stylesheet" href="static/styles.css">
+  <link rel="stylesheet" href="static/search.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="back"><a href="index.html">← Semantic Axes</a></p>
+    <h1>Why vector search?</h1>
+    <p class="sub">A <b>keyword</b> search matches letters. A <b>vector</b> search matches meaning. They
+      sound similar; they return almost opposite things. Type a word and watch the gap — then keep
+      scrolling to see <i>why</i> it happens.</p>
+
+    <form id="q" autocomplete="off">
+      <input id="qInput" type="text" placeholder="a word, e.g. king" aria-label="query word" spellcheck="false">
+      <button type="submit">search</button>
+    </form>
+    <div class="samples">try:
+      <button data-q="king">king</button>·
+      <button data-q="doctor">doctor</button>·
+      <button data-q="happy">happy</button>·
+      <button data-q="car">car</button>·
+      <button data-q="ocean">ocean</button>·
+      <button data-q="music">music</button>
+    </div>
+    <div id="meta">loading embeddings…</div>
+  </header>
+
+  <div id="notice"></div>
+
+  <!-- STAGE 1 — the spine: two searches, one query -->
+  <section id="stageContrast">
+    <p class="eyebrow">two searches, one query</p>
+    <div id="recall" class="recall"></div>
+    <div class="cols">
+      <div class="col">
+        <h3>keyword search <span class="muted">— shared letters (trigram)</span></h3>
+        <ol id="kwList" class="reslist"></ol>
+      </div>
+      <div class="col">
+        <h3>vector search <span class="muted">— shared meaning (cosine)</span></h3>
+        <ol id="vecList" class="reslist"></ol>
+      </div>
+    </div>
+    <p class="hint" id="contrastNote">Words in <span class="ov">both</span> columns are the easy cases —
+      where spelling and meaning happen to agree. Click any word to search it.</p>
+  </section>
+
+  <!-- STAGE 2 — the same hits, on a map of meaning -->
+  <section id="stageMap" style="display:none;">
+    <p class="eyebrow">the same hits, on a map of meaning</p>
+    <canvas id="map"></canvas>
+    <p class="hint">Position ≈ meaning (a 2-D PCA shadow — indicative, not exact). The
+      <span class="kw">keyword</span> hits scatter across the whole space — words that share letters can
+      mean anything — while the <span class="vec">vector</span> hits collapse into one neighborhood.
+      That scatter is the lexical gap, made spatial. Click a labeled dot to search it.</p>
+  </section>
+
+  <!-- STAGE 3 — meaning is a navigable web -->
+  <section id="stageGraph" style="display:none;">
+    <p class="eyebrow">meaning is a navigable web</p>
+    <canvas id="graph"></canvas>
+    <p class="hint">The query and its nearest meanings, as a graph. <span class="vec">Orange = expanded</span>;
+      <span class="kw">blue = a leaf you can grow</span> — click any leaf to sprout its own neighbors and
+      wander concept-space (click an expanded node to re-center). Keyword search has no such web: its
+      links are spelling accidents that dead-end.</p>
+  </section>
+
+  <p class="bias-note" id="payoff">
+    <b>The vocabulary problem.</b> Two people pick the same word for the same thing less than
+    <b>20%</b> of the time
+    (<a href="https://dl.acm.org/doi/10.1145/32206.32212" target="_blank" rel="noopener">Furnas et al. 1987</a>),
+    so a keyword index — matching surface form — misses most of what a searcher means, while returning
+    look-alikes that mean nothing related. Vector search closes that <i>lexical gap</i> by comparing
+    meaning. (This is a <i>word-level</i> stand-in for document/passage retrieval, but the gap is the same.)
+  </p>
+
+  <footer>
+    Vectors: GloVe 6B (300-d). Keyword baseline: character-trigram Jaccard (à la PostgreSQL
+    <code>pg_trgm</code>). Companion to <a href="index.html">Semantic Axes</a>.
+  </footer>
+
+</div>
+
+<script src="static/embed.js"></script>
+<script src="static/lexical.js"></script>
+<script src="static/searchvis.js"></script>
+<script src="static/search.js"></script>
+</body>
+</html>

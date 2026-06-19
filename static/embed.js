@@ -78,6 +78,23 @@ const Embed = (() => {
     return _nc.list.slice(0, Math.min(k, NBR_CACHE_K));
   }
 
+  // top-k cosine neighbors restricted to the first `n` rows (the frequency-ordered "corpus").
+  // Used by the vector-vs-text search demo so both searches range over the same word set.
+  function nearestIn(w, n, k = 12) {
+    const i = row(w);
+    if (i === undefined) return [];
+    n = Math.min(n, count);
+    const off = i * dim, sc2 = scale * scale, out = [];
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      let s = 0, o2 = j * dim;
+      for (let d = 0; d < dim; d++) s += q[off + d] * q[o2 + d];
+      out.push([j, s]);
+    }
+    out.sort((a, b) => b[1] - a[1]);
+    return out.slice(0, k).map(([j, s]) => ({ word: words[j], score: s * sc2, idx: j }));
+  }
+
   const dotVec = (a, b) => { let s = 0; for (let d = 0; d < dim; d++) s += a[d] * b[d]; return s; };
   // raw (unscaled) projection of word-row idx onto an arbitrary vector — for ranking only
   function projectRowVec(idx, v) { let s = 0, off = idx * dim; for (let d = 0; d < dim; d++) s += q[off + d] * v[d]; return s; }
@@ -146,8 +163,42 @@ const Embed = (() => {
     return [];
   }
 
+  // Global PCA-2D layout of the first `n` rows -> coords[i] = [x,y] (a "meaning map").
+  // Same power-iteration as localPCA, two components, over the whole sample. Cached by n.
+  let _layoutCache = { n: 0, coords: null };
+  function layout2d(n) {
+    n = Math.min(n, count);
+    if (_layoutCache.n === n) return _layoutCache.coords;
+    const mean = new Float64Array(dim);
+    for (let i = 0; i < n; i++) { const o = i * dim; for (let d = 0; d < dim; d++) mean[d] += q[o + d]; }
+    for (let d = 0; d < dim; d++) mean[d] /= n;
+    const X = []; for (let i = 0; i < n; i++) { const o = i * dim, r = new Float64Array(dim); for (let d = 0; d < dim; d++) r[d] = q[o + d] - mean[d]; X.push(r); }
+    const comps = [];
+    for (let c = 0; c < 2; c++) {
+      let u = new Float64Array(dim);
+      for (let d = 0; d < dim; d++) u[d] = Math.sin((d + 1) * (c + 1) * 0.7);
+      let un = 0; for (let d = 0; d < dim; d++) un += u[d] * u[d]; un = Math.sqrt(un) || 1; for (let d = 0; d < dim; d++) u[d] /= un;
+      for (let it = 0; it < 40; it++) {
+        const y = new Float64Array(dim);
+        for (const r of X) { let dot = 0; for (let d = 0; d < dim; d++) dot += r[d] * u[d]; for (let d = 0; d < dim; d++) y[d] += dot * r[d]; }
+        for (const p of comps) { let dot = 0; for (let d = 0; d < dim; d++) dot += y[d] * p[d]; for (let d = 0; d < dim; d++) y[d] -= dot * p[d]; }
+        let ny = 0; for (let d = 0; d < dim; d++) ny += y[d] * y[d]; ny = Math.sqrt(ny) || 1; for (let d = 0; d < dim; d++) y[d] /= ny;
+        u = y;
+      }
+      comps.push(u);
+    }
+    const coords = new Array(n);
+    for (let i = 0; i < n; i++) {
+      const o = i * dim; let x = 0, yy = 0;
+      for (let d = 0; d < dim; d++) { const v = q[o + d] - mean[d]; x += v * comps[0][d]; yy += v * comps[1][d]; }
+      coords[i] = [x, yy];
+    }
+    _layoutCache = { n, coords };
+    return coords;
+  }
+
   return { load, has, row, wordAt, allAxes, axisById, vocabList, metaInfo,
-           axisScores, nearest, projectWord, customAxis, suggest, dotRowFloat,
-           localPCA, dotVec, projectRowVec,
+           axisScores, nearest, nearestIn, projectWord, customAxis, suggest, dotRowFloat,
+           localPCA, layout2d, dotVec, projectRowVec,
            get dim() { return dim; }, get count() { return count; } };
 })();

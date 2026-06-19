@@ -1,0 +1,46 @@
+/* search.css — layout for the "why vector search?" companion page.
+ * Reuses the design tokens + many classes from styles.css (.wrap, .sub, .samples, .eyebrow,
+ * .hint, .muted, .wlink, .bias-note, footer). Adds the search form + two-column contrast. */
+
+.back { margin: 0 0 .4rem; font-size: .82rem; }
+.back a { color: var(--accent2); text-decoration: none; border-bottom: 1px dotted var(--mute); }
+.back a:hover { color: var(--accent); }
+
+#q { display: flex; gap: .5rem; margin-bottom: .5rem; }
+#qInput {
+  flex: 1; font-family: var(--serif); font-size: 1.5rem; padding: .45rem .7rem;
+  border: 1px solid var(--ink); border-radius: 2px; background: #fff; color: var(--ink);
+}
+#qInput:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+#q button { font-size: 1rem; padding: 0 1.1rem; border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: 2px; cursor: pointer; }
+#meta { font-size: .78rem; color: var(--mute); margin-bottom: 1.6rem; font-variant-numeric: tabular-nums; }
+
+#notice { display: none; background: #fff4ec; border: 1px solid #f0c9ad; padding: .7rem .9rem; border-radius: 3px; font-size: .92rem; }
+
+/* recall gauge */
+.recall { margin: .2rem 0 1.1rem; font-size: 1rem; line-height: 1.45; }
+.recall .big { font-family: var(--serif); font-size: 1.5rem; color: var(--accent); font-weight: 600; }
+
+/* two columns */
+.cols { display: flex; gap: 1.4rem; align-items: flex-start; }
+.col { flex: 1; min-width: 0; }
+.col h3 { font-family: var(--sans); font-size: .9rem; font-weight: 600; margin: 0 0 .5rem; padding-bottom: .3rem; border-bottom: 2px solid var(--ink); }
+.col h3 .muted { font-weight: 400; }
+
+.reslist { list-style: none; margin: 0; padding: 0; }
+.reslist li { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; padding: .22rem .35rem; border-bottom: 1px solid var(--hair); }
+.reslist li.empty { color: var(--mute); font-style: italic; justify-content: flex-start; }
+.reslist .wlink { font-family: var(--serif); font-size: 1.12rem; border-bottom: none; }
+.reslist .score { font-size: .78rem; color: var(--mute); font-variant-numeric: tabular-nums; }
+
+/* overlap = a word that shows up in BOTH searches (spelling and meaning agree) */
+.reslist li.ov { background: #fbf3e9; }
+.reslist li.ov .wlink { color: var(--accent2); }
+.hint .ov { background: #fbf3e9; padding: 0 .25rem; border-radius: 2px; color: var(--accent2); }
+
+@media (max-width: 620px) { .cols { flex-direction: column; gap: 1rem; } }
+
+/* meaning-map */
+#map, #graph { margin-top: .2rem; border: 1px solid var(--hair); border-radius: 2px; }
+.hint .kw { color: var(--accent2); font-weight: 600; }
+.hint .vec { color: var(--accent); font-weight: 600; }
