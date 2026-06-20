@@ -37,19 +37,47 @@ const PORT = process.env.PORT || 8777;
   if (!customShown) throw new Error("custom-axis spectrum did not render: " + customTitle);
   await page.screenshot({ path: "tests/browser/custom.png", fullPage: true });
 
-  // SAE substrate: toggle, assert the feature list renders with Neuronpedia links, screenshot
+  // SAE substrate: toggle, assert the distinctive-feature bundle renders, then WANDER —
+  // open a feature -> its receptive field of words -> click one -> a fresh bundle.
   await page.evaluate(() => location.hash = "#w=king");
   await page.waitForTimeout(200);
   await page.click('#backendToggle button[data-backend="sae"]');
   await page.waitForFunction(() => document.getElementById("featureList").style.display !== "none");
   const feats = await page.$$eval("#featureList .feat-label", els => els.map(e => e.textContent.trim()));
-  if (feats.length < 3) throw new Error("SAE feature list did not render: " + feats.join(" | "));
-  const href0 = await page.$eval("#featureList .feat-label", a => a.href);
-  if (!href0.includes("neuronpedia.org")) throw new Error("feature link not to neuronpedia: " + href0);
-  await page.screenshot({ path: "tests/browser/sae.png", fullPage: true });
-  console.log("SAE features (king):", feats.slice(0, 4).join("  |  "));
+  if (feats.length < 3) throw new Error("SAE feature bundle did not render: " + feats.join(" | "));
+  const npHref = await page.$eval("#featureList .feat-np", a => a.href);
+  if (!npHref.includes("neuronpedia.org")) throw new Error("feature ↗ link not to neuronpedia: " + npHref);
 
-  // soft landing on a non-word
+  // open the top feature's receptive field, screenshot the bundle, then hop to a word in it
+  await page.click("#featureList .feat-row:first-child .feat-label");
+  await page.waitForFunction(() => {
+    const w = document.querySelector("#featureList .feat-row:first-child .feat-words");
+    return w && w.style.display !== "none" && w.querySelectorAll(".chip").length > 0;
+  });
+  const rf = await page.$$eval("#featureList .feat-row:first-child .feat-words .chip", c => c.map(x => x.textContent));
+  await page.screenshot({ path: "tests/browser/sae.png", fullPage: true });
+  await page.click("#featureList .feat-row:first-child .feat-words .chip");
+  await page.waitForFunction(() => document.getElementById("queryInput").value !== "king");
+  const hopped = await page.$eval("#queryInput", i => i.value);
+  console.log("SAE features (king):", feats.slice(0, 3).join("  |  "));
+  console.log("receptive field of top feature:", rf.slice(0, 8).join(", "), " → hopped to", hopped);
+
+  // compare mode: the two-substrate confrontation renders both columns for the same word
+  await page.evaluate(() => location.hash = "#w=king");
+  await page.waitForTimeout(150);
+  await page.click('#backendToggle button[data-backend="compare"]');
+  await page.waitForFunction(() => document.getElementById("compareSection").style.display !== "none");
+  await page.waitForFunction(() =>
+    document.querySelectorAll("#cmpStaticRows .cmp-row").length > 0 &&
+    document.querySelectorAll("#cmpSaeRows .cmp-row").length > 0);
+  const cmpL = await page.$$eval("#cmpStaticRows .cmp-name", e => e.map(x => x.textContent.trim()));
+  const cmpR = await page.$$eval("#cmpSaeRows .cmp-name", e => e.map(x => x.textContent.trim()));
+  await page.screenshot({ path: "tests/browser/compare.png", fullPage: true });
+  console.log("compare — ours:", cmpL.slice(0, 3).join(", "), " || model's:", cmpR.slice(0, 2).join(" / "));
+
+  // back to static, then soft landing on a non-word
+  await page.click('#backendToggle button[data-backend="static"]');
+  await page.waitForFunction(() => document.getElementById("axisSection").style.display !== "none");
   await page.evaluate(() => location.hash = "#w=zzqx");
   await page.waitForFunction(() => document.getElementById("notice").style.display === "block");
 

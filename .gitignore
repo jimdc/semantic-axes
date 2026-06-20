@@ -1,6 +1,8 @@
 # build inputs (large, re-downloadable) — not shipped; data/*.json + vectors.bin ARE shipped
 data/glove*.txt
 data/glove*.zip
+# local-build accelerator cache (feature->label); rebuilt on demand, labels also live in sae_features.json
+data/feature_labels.json
 node_modules/
 test-results/
 .DS_Store

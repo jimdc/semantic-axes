@@ -112,48 +112,94 @@ StaticEmbeddingBackend.STOP = new Set((
   "down over about after before however finally first second another each both either"
 ).split(" "));
 
-/* SAEBackend — the substrate swap. Reads SAE features precomputed by tools/build_sae.py
- * (Neuronpedia search-all) and fills the SAME QueryResult shape as the static backend:
- *   each top SAE feature -> Axis {id, label:explanation, score:activation, featureId}.
- * Neighbors = other words that fire on the same features. The SAE substrate has no continuous
- * geometry, so the static-only geometric views (spectrum, scatter, custom axis, PCA discovery)
- * don't apply — the front-end hides them in this mode. */
+/* SAEBackend — the substrate swap, as a navigable word<->feature graph.
+ *
+ * Reads SAE features precomputed by tools/build_sae.py (Neuronpedia search-all) and fills the SAME
+ * QueryResult shape as the static backend — but the SAE substrate is READ, not steered (its sibling
+ * intrusive-thought owns steering). The lesson here is structural: a word is a BUNDLE of features
+ * firing at once; a feature is SHARED across many words; "similar" means "shares features". Two moves
+ * make that legible instead of noisy:
+ *   - distinctiveness re-rank. On a bare word at layer 20 the top-by-activation features are mostly
+ *     boilerplate (start-of-document, proper-nouns) that fire on ~every word and so say nothing about
+ *     THIS one. We measure each feature's document frequency across the set and split a word's bundle
+ *     into distinctive (high act*idf — where the meaning is) and generic (fires on >=GENERIC of the
+ *     set — demoted). The de-noising IS the intuition pump.
+ *   - the receptive field. wordsFiringOn(feature) returns the words that light a feature up, so the UI
+ *     can pivot word -> feature -> words -> feature ... — the SAE counterpart to the static side's
+ *     click-to-re-center wander.
+ * The continuous-geometry views (spectrum, scatter, custom axis, PCA) don't apply; the UI hides them. */
 class SAEBackend {
-  constructor() { this.name = "sae"; this._ready = null; this.data = null; }
+  constructor() { this.name = "sae"; this._ready = null; this.data = null; this.df = null; this.N = 0; }
 
   ready(base = "") {
     return (this._ready ||= fetch(base + "data/sae_features.json")
       .then(r => r.ok ? r.json() : Promise.reject(new Error("sae_features.json missing — run tools/build_sae.py")))
-      .then(d => { this.data = d; return { nAxes: `${d.count} words`, model: `${d.model}/${d.sourceSet} SAE` }; }));
+      .then(d => { this.data = d; this._index(); return { nAxes: `${d.count} words`, model: `${d.model}/${d.sourceSet} SAE` }; }));
+  }
+
+  // document frequency per feature across the whole set — the measure of how generic a feature is
+  _index() {
+    this.N = Object.keys(this.data.words).length;
+    this.df = new Map(); this.labelOf = new Map();
+    for (const feats of Object.values(this.data.words))
+      for (const f of feats) {
+        this.df.set(f.id, (this.df.get(f.id) || 0) + 1);
+        if (!this.labelOf.has(f.id)) this.labelOf.set(f.id, f.label);
+      }
   }
 
   has(word) { return !!(this.data && this.data.words[word]); }
   vocab() { return this.data ? Object.keys(this.data.words) : []; }
   model() { return this.data ? this.data.model : ""; }
 
+  _fires(id) { return this.df.get(id) || 0; }
+  _generic(id) { return this._fires(id) / this.N >= SAEBackend.GENERIC; }
+  _idf(id) { return Math.log(this.N / (this._fires(id) || 1)); }
+
+  // a word's bundle, split into the distinctive features (high act*idf, where the meaning lives) and
+  // the generic ones (fire on most text). distinctive ranked by distinctiveness, generic by activation.
   query(word, { axesK = 8 } = {}) {
     const w = this.data && this.data.words[word];
     if (!w) return { word, backend: this.name, axes: [], neighbors: [], missing: true };
-    const maxAct = Math.max(...w.map(f => f.act)) || 1;
-    const axes = w.slice(0, axesK).map(f => ({
-      id: f.id, label: f.label, score: f.act / maxAct, act: f.act,
-      featureId: f.id, poles: null, confidence: null,
+    const rows = w.map(f => ({
+      id: f.id, label: f.label, act: f.act, featureId: f.id, poles: null, confidence: null,
+      fires: this._fires(f.id), generic: this._generic(f.id), distinct: f.act * this._idf(f.id),
     }));
-    return { word, backend: this.name, axes, neighbors: this.neighbors(word) };
+    const distinctive = rows.filter(r => !r.generic).sort((a, b) => b.distinct - a.distinct).slice(0, axesK);
+    const generic = rows.filter(r => r.generic).sort((a, b) => b.act - a.act);
+    const maxAct = Math.max(1, ...distinctive.map(r => r.act));
+    distinctive.forEach(r => r.score = r.act / maxAct);
+    return { word, backend: this.name, axes: distinctive, generic, neighbors: this.neighbors(word) };
   }
 
-  // neighbors = words sharing the most top-features (simple overlap)
+  // the receptive field of a feature: the words in the set that fire it, strongest first.
+  wordsFiringOn(featureId, k = 40) {
+    const out = [];
+    for (const [word, feats] of Object.entries(this.data.words)) {
+      const f = feats.find(x => x.id === featureId);
+      if (f) out.push({ word, act: f.act });
+    }
+    out.sort((a, b) => b.act - a.act);
+    return { label: this.labelOf.get(featureId) || featureId, fires: out.length, words: out.slice(0, k) };
+  }
+
+  // neighbors = words sharing DISTINCTIVE features, ranked by summed idf (a rare shared feature is
+  // strong evidence; a semi-common one is weak). Counting generic features would make every word the
+  // neighbor of every other. Each neighbor carries WHY: the shared feature labels, most distinctive first.
   neighbors(word, k = 14) {
     const w = this.data && this.data.words[word];
     if (!w) return [];
-    const mine = new Set(w.map(f => f.id)), out = [];
+    const mine = new Map(w.filter(f => !this._generic(f.id)).map(f => [f.id, f.label]));
+    const out = [];
     for (const [other, feats] of Object.entries(this.data.words)) {
       if (other === word) continue;
-      let shared = 0; for (const f of feats) if (mine.has(f.id)) shared++;
-      if (shared > 0) out.push({ word: other, score: shared });
+      let score = 0; const shared = [];
+      for (const f of feats) if (mine.has(f.id)) { score += this._idf(f.id); shared.push({ label: mine.get(f.id), idf: this._idf(f.id) }); }
+      if (shared.length) { shared.sort((a, b) => b.idf - a.idf); out.push({ word: other, score, shared: shared.map(s => s.label) }); }
     }
     return out.sort((a, b) => b.score - a.score).slice(0, k);
   }
 }
+SAEBackend.GENERIC = 0.30;   // a feature firing on >=30% of the set is "generic" (low signal for any one word)
 // a feature's page on Neuronpedia, e.g. gpt2-small/11-res-jb/12786
 SAEBackend.featureUrl = (model, id) => `https://www.neuronpedia.org/${model}/${id}`;

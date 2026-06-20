@@ -36,12 +36,28 @@
     <div id="backendToggle" class="backend-toggle">substrate:
       <button data-backend="static" class="active">static embeddings</button>
       <button data-backend="sae">SAE features</button>
+      <button data-backend="compare">compare ⇄</button>
       <span class="hint" id="backendHint"></span>
     </div>
     <p class="companion">▶ companion: <a href="search.html">Why vector search beats keyword search</a> — an intuition pump.</p>
   </header>
 
   <div id="notice"></div>
+
+  <section id="compareSection" style="display:none;">
+    <p class="eyebrow">two decompositions of <b id="cmpWord">king</b> <span class="muted">— ours vs the model’s</span></p>
+    <div class="cmp-grid">
+      <div class="cmp-col">
+        <p class="cmp-head">our axes <span class="muted">— curated, named, signed</span></p>
+        <div id="cmpStaticRows"></div>
+      </div>
+      <div class="cmp-col">
+        <p class="cmp-head">the model’s features <span class="muted">— learned, sparse, emergent</span></p>
+        <div id="cmpSaeRows"></div>
+      </div>
+    </div>
+    <p class="hint cmp-punch" id="cmpPunch"></p>
+  </section>
 
   <section id="axisSection">
     <p class="eyebrow" id="axisEyebrow">where <b id="currentWord">king</b> sits — its most salient axes</p>
@@ -56,8 +72,9 @@
   </section>
 
   <section id="neighborSection">
-    <p class="eyebrow">nearest in meaning</p>
+    <p class="eyebrow" id="nbrEyebrow">nearest in meaning</p>
     <div id="neighbors"></div>
+    <p class="hint" id="nbrWhy" style="display:none;"></p>
   </section>
 
   <section id="scatterSection" style="display:none;">
@@ -90,26 +107,6 @@
       <span class="muted">— unsupervised PCA, model-proposed, not from the curated bank</span></p>
     <div id="discovery"></div>
   </section>
-
-  <p class="bias-note">
-    <b>What a score measures.</b> A projection is a statistic of the training corpus, read out of a
-    vector space fit under the <i>distributional hypothesis</i> (tokens that share contexts get nearby
-    vectors). The operation is old and general — locate a word between two poles, as in Osgood’s
-    <a href="https://en.wikipedia.org/wiki/Semantic_differential" target="_blank" rel="noopener">semantic
-    differential</a> (1957) — and done well it recovers graded human knowledge: Grand et al.’s
-    <a href="https://arxiv.org/abs/1802.01241" target="_blank" rel="noopener">semantic projection</a>
-    lays animals along a <i>size</i> line (ant → whale) or a <i>danger</i> line and matches people’s
-    ratings. The same geometry yields the analogy regularities
-    (<a href="https://aclanthology.org/N13-1090/" target="_blank" rel="noopener">Mikolov 2013</a>:
-    king − man + woman ≈ queen) and the interpretable dimensions of
-    <a href="https://arxiv.org/abs/2001.09876" target="_blank" rel="noopener">POLAR</a> /
-    <a href="https://arxiv.org/abs/1806.05521" target="_blank" rel="noopener">SemAxis</a>. Projecting
-    onto <i>social</i> categories — what the association literature
-    (<a href="https://arxiv.org/abs/1607.06520" target="_blank" rel="noopener">Bolukbasi 2016</a>,
-    <a href="https://arxiv.org/abs/1608.07187" target="_blank" rel="noopener">WEAT</a>) measures — is
-    one application of this, not the whole story. A value depends on the training sample and the poles
-    you pick, and these static vectors collapse context and word sense.
-  </p>
 
   <footer>
     Static substrate: GloVe 6B (Wikipedia + Gigaword, 300-d), centered → L2-normalized → int8.

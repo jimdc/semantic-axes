@@ -24,8 +24,13 @@ A toggle switches what's *behind* the same views:
   (`man − woman`, `king − queen`…). Gives you the full geometric toolkit: salient-axis bars,
   an axis spectrum, a 2-D scatter, a custom-axis builder, and unsupervised PCA discovery.
 - **SAE features.** The model's *own* learned concepts, via [Neuronpedia](https://neuronpedia.org)
-  sparse-autoencoder features (Gemma Scope on `gemma-2-2b`). `king` lights up "references to kings
-  and royal titles"; each feature links out to Neuronpedia. A gentle on-ramp to mechanistic interpretability.
+  sparse-autoencoder features (Gemma Scope on `gemma-2-2b`). This side is for **reading** an SAE (its
+  sibling [intrusive-thought](https://jimdc.github.io/intrusive-thought/) is for *steering* one): a
+  word is a **bundle** of features firing at once; a feature is **shared** across words; "similar"
+  means "shares features". Click a feature to open its **receptive field** — the other words that fire
+  it — then click a word to open *its* bundle, and wander the word↔feature graph. Boilerplate features
+  that fire on ~every word (`start of a document`, `proper nouns`) are demoted as *generic*, so the few
+  distinctive features — where the meaning actually is — rise to the top.
 
 Both fill the identical `QueryResult` shape, so the front-end never changes — the substrate is a
 swappable backend (`static/backend.js`).
@@ -55,6 +60,14 @@ SAE_MODEL=gemma-2-2b SAE_SOURCESET=gemmascope-res-16k SAE_LAYERS=20-gemmascope-r
   .venv/bin/python tools/build_sae.py --top 1500   # -> data/sae_features.json
 ```
 
+> **Optional — build locally, without the per-word API.** Neuronpedia is rate-limited, so the API
+> build above caps coverage in practice. If you can run Gemma-2-2b + the Gemma Scope SAE on your own
+> machine, point `GEMMA_SCOPE_LOCAL` at a directory holding a `gemma_scope_local` module (with
+> `load()` → `.features(word)`) and run `tools/build_sae_local.py --top N`: activations are computed
+> on-device (no per-word API, no rate limit), and feature *labels* are fetched from Neuronpedia only
+> once per feature (cached in the git-ignored `data/feature_labels.json`). Unset, it falls back to the
+> portable `build_sae.py` path. The ceiling that remains is the shipped JSON size (~1.4 KB/word).
+
 > The shipped `data/vectors.bin` is ~50 MB (≈169k words). If you track it in git, use
 > [Git LFS](https://git-lfs.com), or `.gitignore` it and rebuild with the command above — the build
 > is deterministic.
@@ -75,8 +88,10 @@ for talks and workshops on how models inherit stereotypes.
 science` — and slide a word's neighbors along *your* scale to find the one with the right
 connotation. A semantic thesaurus that understands register and tone, not just synonymy.
 
-**Interpretability on-ramp.** Flip to the SAE substrate to see which of a model's learned features
-fire on a word, then click through to Neuronpedia. A low-friction first taste of mechanistic interp.
+**Interpretability on-ramp.** Flip to the SAE substrate and wander the word↔feature graph: open a
+word's bundle, see that most of what fires is generic boilerplate and the *meaning* lives in a few
+distinctive features, open one to see the other words it fires on, and hop. A low-friction first taste
+of superposition and polysemanticity (the per-feature ↗ still links out to Neuronpedia for the deep dive).
 
 **Quick research probe.** Sanity-check an embedding space, eyeball analogies, or prototype a named
 axis before writing any code — the axis bank is editable JSON (`tools/axis_bank.json`).
@@ -111,7 +126,27 @@ polysemy (`wolf` splits into the animal *dog · beaver · eagle* and the surname
 - **SAE.** `build_sae.py` calls Neuronpedia `/api/search-all` per word (default Gemma Scope
   `gemma-2-2b`, layer 20) and stores the top features + explanations; the browser reads that JSON. The
   run is resumable/mergeable, so coverage grows toward `--all` (full static↔SAE symmetry). No key or
-  cross-origin call ever happens client-side.
+  cross-origin call ever happens client-side. In the browser, the SAE side computes each feature's
+  **document frequency** across the set to split a word's bundle into *distinctive* (high
+  activation × idf) vs *generic*, and `wordsFiringOn(feature)` gives the receptive field that powers
+  the word↔feature wander.
+
+## Design notes
+
+The SAE substrate was re-grounded (see the `reground-design` workflow) to stop being a thin, "tell"
+read-out and to teach a facet its sibling doesn't:
+
+- **Load-bearing point.** A word is a *bundle* of shared features; meaning lives in the *distinctive*
+  ones; similarity is shared features. This is the **read** complement to
+  [intrusive-thought](https://jimdc.github.io/intrusive-thought/)'s **write** (feature steering) —
+  which is the named **foil**: don't re-do steering here, and don't just mirror the static side's bars.
+- **Principle (Tufte, *Visual Display*, cangshu #699).** Maximize the data-ink ratio / erase non-data
+  ink: the generic, fire-on-everything features are chartjunk for any single word, so they're demoted
+  to one greyed line; one accent (rust) marks the opened feature; direct labels over chrome. The
+  removed "What a score measures" prose block was non-data-ink competing with the interaction.
+- **Exemplar.** Neuronpedia's feature dashboards (a feature ↔ the tokens/words that activate it) and
+  the bipartite word↔feature structure of SAE explorers — adapted into an in-page wander instead of an
+  out-link.
 
 ## What a score measures
 

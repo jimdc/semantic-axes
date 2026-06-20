@@ -34,13 +34,45 @@ header .sub b { color: var(--ink); font-weight: 600; }
 .backend-toggle button.active { border-color: var(--ink); background: var(--ink); color: #fff; }
 .backend-toggle .hint { margin: 0; }
 
-/* SAE feature list */
-.feat-row { margin: .45rem 0; }
-.feat-label { display: block; font-family: var(--serif); font-size: 1.02rem; color: var(--ink); text-decoration: none; border-bottom: 1px dotted transparent; }
+/* SAE bundle — distinctive features you can open into their receptive field (the words they fire on) */
+.feat-row { margin: .55rem 0; }
+.feat-head { display: flex; align-items: baseline; gap: .35rem; flex-wrap: wrap; }
+.feat-label { font-family: var(--serif); font-size: 1.02rem; color: var(--ink); background: none; border: none; padding: 0; text-align: left; cursor: pointer; border-bottom: 1px dotted var(--faint); }
 .feat-label:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .feat-act { color: var(--mute); font-size: .8rem; font-variant-numeric: tabular-nums; }
-.feat-track { height: 6px; background: #efeae3; border-radius: 2px; margin-top: .2rem; overflow: hidden; }
+.feat-meta { color: var(--mute); font-size: .75rem; }
+.feat-np { color: var(--mute); text-decoration: none; font-size: .85rem; margin-left: auto; padding-left: .4rem; }
+.feat-np:hover { color: var(--accent); }
+.feat-track { height: 6px; background: #efeae3; border-radius: 2px; margin-top: .25rem; overflow: hidden; }
 .feat-meter { height: 100%; background: var(--accent); }
+.feat-words { margin: .35rem 0 .1rem; padding: .45rem .55rem; background: #fff; border-left: 2px solid var(--accent); display: flex; flex-wrap: wrap; gap: .3rem; align-items: baseline; }
+.feat-words-lead { font-size: .8rem; color: var(--mute); font-style: italic; }
+.feat-generic { margin: 1rem 0 .2rem; font-size: .8rem; color: var(--mute); line-height: 1.8; }
+.feat-glabel { font-style: italic; }
+.feat-gitem { color: var(--mute); text-decoration: none; border-bottom: 1px dotted var(--faint); }
+.feat-gitem:hover { color: var(--accent); border-bottom-color: var(--accent); }
+#nbrWhy { font-style: normal; }
+#nbrWhy b { color: var(--accent); font-weight: 600; }
+
+/* compare — the two-substrate confrontation (ours, blue · the model's, rust) */
+.cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; }
+@media (max-width: 620px) { .cmp-grid { grid-template-columns: 1fr; gap: 1.1rem; } }
+.cmp-col { min-width: 0; }
+.cmp-head { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); margin: 0 0 .7rem; padding-bottom: .35rem; border-bottom: 1px solid var(--hair); }
+.cmp-head .muted { text-transform: none; letter-spacing: 0; }
+.cmp-row { margin: .55rem 0; }
+.cmp-lab { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.cmp-name { font-family: var(--serif); font-size: .98rem; color: var(--ink); }
+a.cmp-feat { text-decoration: none; border-bottom: 1px dotted var(--faint); }
+a.cmp-feat:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.cmp-val { font-size: .76rem; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cmp-track { height: 6px; background: #efeae3; border-radius: 2px; margin-top: .22rem; overflow: hidden; }
+.cmp-bar { height: 100%; }
+.cmp-bar.static { background: var(--accent2); }
+.cmp-bar.sae { background: var(--accent); }
+.cmp-generic { font-size: .76rem; color: var(--mute); font-style: italic; margin-top: .7rem; line-height: 1.6; }
+.cmp-punch { max-width: 70ch; margin-top: 1.5rem; border-top: 1px solid var(--hair); padding-top: .9rem; font-style: normal; }
+.cmp-punch b { color: var(--accent); font-weight: 600; }
 
 section { margin-bottom: 2rem; }
 .eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: var(--mute); margin: 0 0 .5rem; }
@@ -87,7 +119,5 @@ canvas { display: block; max-width: 100%; }
 .wlink { font-family: var(--serif); font-size: 1rem; background: none; border: none; color: var(--ink); cursor: pointer; padding: 0 .15rem; border-bottom: 1px dotted var(--faint); }
 .wlink:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
-.bias-note { margin-top: 2.5rem; border-top: 1px solid var(--hair); padding-top: 1rem; font-size: .82rem; color: var(--mute); max-width: 64ch; }
-.bias-note b { color: var(--accent2); }
-footer { margin-top: 2rem; font-size: .76rem; color: var(--mute); }
+footer { margin-top: 2.5rem; border-top: 1px solid var(--hair); padding-top: 1rem; font-size: .76rem; color: var(--mute); }
 footer code { font-family: ui-monospace, Menlo, monospace; background: #f1ede6; padding: .05rem .3rem; border-radius: 2px; }
